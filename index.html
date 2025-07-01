@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoniePoint Nigeria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        }
+        .transaction-card {
+            transition: all 0.3s ease;
+        }
+        .transaction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .nav-item {
+            position: relative;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #2563eb;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://moniepoint.com/wp-content/uploads/2022/03/moniepoint-logo.svg" alt="MoniePoint Logo" class="h-10">
+                    <span class="ml-2 text-xl font-bold">MoniePoint</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button id="notifications-btn" class="p-2 rounded-full hover:bg-blue-800">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        </button>
+                        <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10">
+                            <div class="p-4 border-b">
+                                <h3 class="text-gray-800 font-semibold">Notifications</h3>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto">
+                                <div class="p-3 border-b hover:bg-gray-50 cursor-pointer">
+                                    <p class="text-sm text-gray-700">You received ₦15,000 from John Doe</p>
+                                    <p class="text-xs text-gray-500">10 mins ago</p>
+                                </div>
+                                <div class="p-3 border-b hover:bg-gray-50 cursor-pointer">
+                                    <p class="text-sm text-gray-700">Your transfer to GTBank was successful</p>
+                                    <p class="text-xs text-gray-500">45 mins ago</p>
+                                </div>
+                                <div class="p-3 hover:bg-gray-50 cursor-pointer">
+                                    <p class="text-sm text-gray-700">Your account has been credited with ₦5,000</p>
+                                    <p class="text-xs text-gray-500">2 hours ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <button id="profile-btn" class="flex items-center space-x-2">
+                            <div class="h-8 w-8 rounded-full bg-blue-300 flex items-center justify-center">
+                                <i class="fas fa-user text-blue-800"></i>
+                            </div>
+                            <span class="font-medium">User</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <div class="py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Left Sidebar -->
+            <div class="w-full lg:w-1/4">
+                <!-- Account Balance Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-gray-500 text-sm font-medium">Available Balance</h2>
+                        <button class="text-blue-600 text-sm font-medium">View Details</button>
+                    </div>
+                    <h1 class="text-3xl font-bold mb-2">₦<span id="account-balance">48,750.00</span></h1>
+                    <div class="flex justify-between text-sm text-gray-500">
+                        <span>Account: 0123456789</span>
+                        <span>MoniePoint MFB</span>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-lg font-semibold mb-4">Quick Actions</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="quick-action-btn" data-action="transfer">
+                            <div class="bg-blue-100 p-3 rounded-full mb-2">
+                                <i class="fas fa-exchange-alt text-blue-600"></i>
+                            </div>
+                            <span>Transfer</span>
+                        </button>
+                        <button class="quick-action-btn" data-action="deposit">
+                            <div class="bg-green-100 p-3 rounded-full mb-2">
+                                <i class="fas fa-money-bill-wave text-green-600"></i>
+                            </div>
+                            <span>Deposit</span>
+                        </button>
+                        <button class="quick-action-btn" data-action="withdraw">
+                            <div class="bg-purple-100 p-3 rounded-full mb-2">
+                                <i class="fas fa-wallet text-purple-600"></i>
+                            </div>
+                            <span>Withdraw</span>
+                        </button>
+                        <button class="quick-action-btn" data-action="bills">
+                            <div class="bg-yellow-100 p-3 rounded-full mb-2">
+                                <i class="fas fa-file-invoice-dollar text-yellow-600"></i>
+                            </div>
+                            <span>Pay Bills</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Contacts -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Recent Contacts</h2>
+                        <button class="text-blue-600 text-sm">See All</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <div class="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-blue-700"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">John Doe</p>
+                                <p class="text-xs text-gray-500">0123456789</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <div class="h-10 w-10 rounded-full bg-green-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-green-700"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Jane Smith</p>
+                                <p class="text-xs text-gray-500">0987654321</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <div class="h-10 w-10 rounded-full bg-purple-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-purple-700"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Mike Johnson</p>
+                                <p class="text-xs text-gray-500">0567894321</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="w-full lg:w-3/4">
+                <!-- Navigation Tabs -->
+                <div class="bg-white rounded-lg shadow-md mb-6">
+                    <div class="flex border-b">
+                        <button class="nav-item active px-6 py-3 text-blue-600 font-medium">Dashboard</button>
+                        <button class="nav-item px-6 py-3 text-gray-500 font-medium hover:text-blue-600">Transactions</button>
+                        <button class="nav-item px-6 py-3 text-gray-500 font-medium hover:text-blue-600">Cards</button>
+                        <button class="nav-item px-6 py-3 text-gray-500 font-medium hover:text-blue-600">Savings</button>
+                    </div>
+                </div>
+
+                <!-- Transaction History -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold">Recent Transactions</h2>
+                        <button class="text-blue-600 text-sm font-medium">View All</button>
+                    </div>
+                    <div id="transactions-list" class="space-y-4">
+                        <!-- Transactions will be added here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Transfer Modal -->
+                <div id="transfer-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg w-full max-w-md">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Transfer Money</h3>
+                                <button id="close-transfer-modal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <form id="transfer-form">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="recipient-bank">
+                                        Recipient Bank
+                                    </label>
+                                    <select id="recipient-bank" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Bank</option>
+                                        <option value="moniepoint">MoniePoint MFB</option>
+                                        <option value="gtbank">GTBank</option>
+                                        <option value="zenith">Zenith Bank</option>
+                                        <option value="access">Access Bank</option>
+                                        <option value="uba">UBA</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="account-number">
+                                        Account Number
+                                    </label>
+                                    <input type="text" id="account-number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter account number">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="account-name">
+                                        Account Name
+                                    </label>
+                                    <input type="text" id="account-name" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="amount">
+                                        Amount (₦)
+                                    </label>
+                                    <input type="number" id="amount" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter amount">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="narration">
+                                        Narration (Optional)
+                                    </label>
+                                    <input type="text" id="narration" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter description">
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancel-transfer" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        Transfer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bill Payment Modal -->
+                <div id="bill-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg w-full max-w-md">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Pay Bills</h3>
+                                <button id="close-bill-modal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <form id="bill-form">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="bill-type">
+                                        Bill Type
+                                    </label>
+                                    <select id="bill-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Bill Type</option>
+                                        <option value="airtime">Airtime</option>
+                                        <option value="data">Data</option>
+                                        <option value="electricity">Electricity</option>
+                                        <option value="cable-tv">Cable TV</option>
+                                        <option value="internet">Internet</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="provider">
+                                        Provider
+                                    </label>
+                                    <select id="provider" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Provider</option>
+                                        <!-- Providers will be populated based on bill type -->
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="bill-account">
+                                        Account Number/Meter Number
+                                    </label>
+                                    <input type="text" id="bill-account" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter account/meter number">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="bill-amount">
+                                        Amount (₦)
+                                    </label>
+                                    <input type="number" id="bill-amount" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter amount">
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancel-bill" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        Pay Bill
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Receipt Modal -->
+                <div id="receipt-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg w-full max-w-md">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Transaction Receipt</h3>
+                                <button id="close-receipt-modal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div id="receipt-content" class="mb-6">
+                                <!-- Receipt content will be added here dynamically -->
+                            </div>
+                            <div class="flex justify-between">
+                                <button id="print-receipt" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                    <i class="fas fa-print mr-2"></i> Print
+                                </button>
+                                <button id="share-receipt" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                    <i class="fas fa-share-alt mr-2"></i> Share
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">MoniePoint</h3>
+                    <p class="text-gray-400">Making financial services accessible and affordable for everyone.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Security</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-400"><i class="fas fa-phone-alt mr-2"></i> +234 700 933 9333</li>
+                        <li class="flex items-center text-gray-400"><i class="fas fa-envelope mr-2"></i> help@moniepoint.com</li>
+                        <li class="flex items-center text-gray-400"><i class="fas fa-map-marker-alt mr-2"></i> Lagos, Nigeria</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2023 MoniePoint MFB. All rights reserved.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const notificationsBtn = document.getElementById('notifications-btn');
+        const notificationsDropdown = document.getElementById('notifications-dropdown');
+        const profileBtn = document.getElementById('profile-btn');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+        const transferModal = document.getElementById('transfer-modal');
+        const closeTransferModal = document.getElementById('close-transfer-modal');
+        const cancelTransfer = document.getElementById('cancel-transfer');
+        const transferForm = document.getElementById('transfer-form');
+        const billModal = document.getElementById('bill-modal');
+        const closeBillModal = document.getElementById('close-bill-modal');
+        const cancelBill = document.getElementById('cancel-bill');
+        const billForm = document.getElementById('bill-form');
+        const receiptModal = document.getElementById('receipt-modal');
+        const closeReceiptModal = document.getElementById('close-receipt-modal');
+        const printReceipt = document.getElementById('print-receipt');
+        const shareReceipt = document.getElementById('share-receipt');
+        const accountBalance = document.getElementById('account-balance');
+        const transactionsList = document.getElementById('transactions-list');
+        const recipientBank = document.getElementById('recipient-bank');
+        const accountNumber = document.getElementById('account-number');
+        const accountName = document.getElementById('account-name');
+        const amount = document.getElementById('amount');
+        const billType = document.getElementById('bill-type');
+        const provider = document.getElementById('provider');
+        const billAccount = document.getElementById('bill-account');
+        const billAmount = document.getElementById('bill-amount');
+
+        // Sample transactions data
+        const transactions = [
+            {
+                id: 1,
+                type: 'credit',
+                amount: 15000,
+                name: 'John Doe',
+                date: '2023-06-15T10:30:00',
+                description: 'Transfer from John Doe',
+                bank: 'GTBank',
+                account: '0123456789'
+            },
+            {
+                id: 2,
+                type: 'debit',
+                amount: 5000,
+                name: 'MTN Airtime',
+                date: '2023-06-15T09:15:00',
+                description: 'Airtime purchase',
+                bank: 'MTN',
+                account: '08012345678'
+            },
+            {
+                id: 3,
+                type: 'credit',
+                amount: 30000,
+                name: 'Salary Payment',
+                date: '2023-06-14T08:00:00',
+                description: 'June Salary',
+                bank: 'Company XYZ',
+                account: 'Payroll'
+            },
+            {
+                id: 4,
+                type: 'debit',
+                amount: 12000,
+                name: 'Jane Smith',
+                date: '2023-06-13T16:45:00',
+                description: 'Transfer to Jane Smith',
+                bank: 'Zenith Bank',
+                account: '0987654321'
+            }
+        ];
+
+        // Bill providers based on bill type
+        const billProviders = {
+            airtime: ['MTN', 'Airtel', 'Glo', '9mobile'],
+            data: ['MTN', 'Airtel', 'Glo', '9mobile', 'Smile', 'Spectranet'],
+            electricity: ['IKEDC', 'EKEDC', 'AEDC', 'BEDC', 'KEDCO', 'PHED', 'IBEDC'],
+            'cable-tv': ['DSTV', 'GOTV', 'Startimes', 'Showmax'],
+            internet: ['Spectranet', 'Smile', 'Tizeti', 'FibreOne']
+        };
+
+        // Initialize the app
+        function init() {
+            // Display transactions
+            displayTransactions();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Simulate random transactions every 15 minutes
+            setInterval(simulateRandomTransaction, 900000); // 15 minutes in milliseconds
+        }
+
+        // Display transactions in the UI
+        function displayTransactions() {
+            transactionsList.innerHTML = '';
+            
+            transactions.forEach(transaction => {
+                const transactionElement = document.createElement('div');
+                transactionElement.className = 'transaction-card bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer';
+                transactionElement.dataset.id = transaction.id;
+                
+                const iconClass = transaction.type === 'credit' ? 'text-green-500' : 'text-red-500';
+                const icon = transaction.type === 'credit' ? 'fa-arrow-down' : 'fa-arrow-up';
+                const sign = transaction.type === 'credit' ? '+' : '-';
+                
+                transactionElement.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full ${transaction.type === 'credit' ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center mr-3">
+                            <i class="fas ${icon} ${iconClass}"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium">${transaction.name}</p>
+                            <p class="text-xs text-gray-500">${new Date(transaction.date).toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'} font-semibold">${sign}₦${transaction.amount.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500">${transaction.description}</p>
+                    </div>
+                `;
+                
+                transactionElement.addEventListener('click', () => showReceipt(transaction));
+                transactionsList.appendChild(transactionElement);
+            });
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Notifications dropdown
+            notificationsBtn.addEventListener('click', () => {
+                notificationsDropdown.classList.toggle('hidden');
+                profileDropdown.classList.add('hidden');
+            });
+
+            // Profile dropdown
+            profileBtn.addEventListener('click', () => {
+                profileDropdown.classList.toggle('hidden');
+                notificationsDropdown.classList.add('hidden');
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!notificationsBtn.contains(e.target) && !notificationsDropdown.contains(e.target)) {
+                    notificationsDropdown.classList.add('hidden');
+                }
+                if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+
+            // Quick action buttons
+            quickActionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+                    
+                    if (action === 'transfer') {
+                        transferModal.classList.remove('hidden');
+                    } else if (action === 'bills') {
+                        billModal.classList.remove('hidden');
+                    } else {
+                        alert(`${action.charAt(0).toUpperCase() + action.slice(1)} feature coming soon!`);
+                    }
+                });
+            });
+
+            // Transfer modal
+            closeTransferModal.addEventListener('click', () => transferModal.classList.add('hidden'));
+            cancelTransfer.addEventListener('click', () => transferModal.classList.add('hidden'));
+            
+            // Bill modal
+            closeBillModal.addEventListener('click', () => billModal.classList.add('hidden'));
+            cancelBill.addEventListener('click', () => billModal.classList.add('hidden'));
+            
+            // Receipt modal
+            closeReceiptModal.addEventListener('click', () => receiptModal.classList.add('hidden'));
+            printReceipt.addEventListener('click', () => {
+                alert('Printing receipt...');
+                // In a real app, this would open the print dialog
+            });
+            shareReceipt.addEventListener('click', () => {
+                alert('Sharing receipt...');
+                // In a real app, this would open the share dialog
+            });
+
+            // Account number validation
+            accountNumber.addEventListener('input', () => {
+                if (accountNumber.value.length === 10) {
+                    // Simulate account name lookup
+                    accountName.value = 'Verified Account';
+                    accountName.classList.remove('bg-gray-100');
+                    accountName.classList.add('bg-green-100');
+                } else {
+                    accountName.value = '';
+                    accountName.classList.remove('bg-green-100');
+                    accountName.classList.add('bg-gray-100');
+                }
+            });
+
+            // Bill type change
+            billType.addEventListener('change', () => {
+                const selectedType = billType.value;
+                provider.innerHTML = '<option value="">Select Provider</option>';
+                
+                if (selectedType && billProviders[selectedType]) {
+                    billProviders[selectedType].forEach(prov => {
+                        const option = document.createElement('option');
+                        option.value = prov.toLowerCase();
+                        option.textContent = prov;
+                        provider.appendChild(option);
+                    });
+                }
+            });
+
+            // Transfer form submission
+            transferForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const transferAmount = parseFloat(amount.value);
+                const currentBalance = parseFloat(accountBalance.textContent.replace(/,/g, ''));
+                
+                if (transferAmount > currentBalance) {
+                    alert('Insufficient balance!');
+                    return;
+                }
+                
+                // Create new transaction
+                const newTransaction = {
+                    id: transactions.length + 1,
+                    type: 'debit',
+                    amount: transferAmount,
+                    name: accountName.value || 'Transfer',
+                    date: new Date().toISOString(),
+                    description: document.getElementById('narration').value || 'Transfer',
+                    bank: recipientBank.options[recipientBank.selectedIndex].text,
+                    account: accountNumber.value
+                };
+                
+                // Add to transactions array
+                transactions.unshift(newTransaction);
+                
+                // Update balance
+                accountBalance.textContent = (currentBalance - transferAmount).toLocaleString();
+                
+                // Close modal and reset form
+                transferModal.classList.add('hidden');
+                transferForm.reset();
+                accountName.value = '';
+                accountName.classList.remove('bg-green-100');
+                accountName.classList.add('bg-gray-100');
+                
+                // Update transactions list
+                displayTransactions();
+                
+                // Show receipt
+                showReceipt(newTransaction);
+                
+                // Send email notification
+                sendEmailNotification(newTransaction, 'debit');
+            });
+
+            // Bill form submission
+            billForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const billPaymentAmount = parseFloat(billAmount.value);
+                const currentBalance = parseFloat(accountBalance.textContent.replace(/,/g, ''));
+                
+                if (billPaymentAmount > currentBalance) {
+                    alert('Insufficient balance!');
+                    return;
+                }
+                
+                // Create new transaction
+                const newTransaction = {
+                    id: transactions.length + 1,
+                    type: 'debit',
+                    amount: billPaymentAmount,
+                    name: provider.options[provider.selectedIndex].text,
+                    date: new Date().toISOString(),
+                    description: `${billType.options[billType.selectedIndex].text} payment`,
+                    bank: provider.options[provider.selectedIndex].text,
+                    account: billAccount.value
+                };
+                
+                // Add to transactions array
+                transactions.unshift(newTransaction);
+                
+                // Update balance
+                accountBalance.textContent = (currentBalance - billPaymentAmount).toLocaleString();
+                
+                // Close modal and reset form
+                billModal.classList.add('hidden');
+                billForm.reset();
+                provider.innerHTML = '<option value="">Select Provider</option>';
+                
+                // Update transactions list
+                displayTransactions();
+                
+                // Show receipt
+                showReceipt(newTransaction);
+                
+                // Send email notification
+                sendEmailNotification(newTransaction, 'debit');
+            });
+        }
+
+        // Show receipt for a transaction
+        function showReceipt(transaction) {
+            const receiptContent = document.getElementById('receipt-content');
+            const iconClass = transaction.type === 'credit' ? 'text-green-500' : 'text-red-500';
+            const icon = transaction.type === 'credit' ? 'fa-arrow-down' : 'fa-arrow-up';
+            const sign = transaction.type === 'credit' ? '+' : '-';
+            const typeText = transaction.type === 'credit' ? 'Credit' : 'Debit';
+            
+            receiptContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="h-16 w-16 rounded-full ${transaction.type === 'credit' ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center mx-auto mb-3">
+                        <i class="fas ${icon} ${iconClass} text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-1">${typeText} of ₦${transaction.amount.toLocaleString()}</h3>
+                    <p class="text-gray-500">${new Date(transaction.date).toLocaleString()}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Transaction ID:</span>
+                        <span class="font-medium">MP${transaction.id.toString().padStart(8, '0')}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Amount:</span>
+                        <span class="font-medium ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'}">${sign}₦${transaction.amount.toLocaleString()}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Type:</span>
+                        <span class="font-medium">${typeText}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Description:</span>
+                        <span class="font-medium">${transaction.description}</span>
+                    </div>
+                    <div class="flex justify-between py-2">
+                        <span class="text-gray-600">Status:</span>
+                        <span class="font-medium text-green-600">Completed</span>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-medium mb-2">${transaction.type === 'credit' ? 'Sender' : 'Recipient'} Details</h4>
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Name:</span>
+                        <span class="font-medium">${transaction.name}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">${transaction.bank === 'MTN' || transaction.bank === 'Airtel' || transaction.bank === 'Glo' || transaction.bank === '9mobile' ? 'Phone Number' : 'Account Number'}:</span>
+                        <span class="font-medium">${transaction.account}</span>
+                    </div>
+                    <div class="flex justify-between py-2">
+                        <span class="text-gray-600">Bank/Provider:</span>
+                        <span class="font-medium">${transaction.bank}</span>
+                    </div>
+                </div>
+            `;
+            
+            receiptModal.classList.remove('hidden');
+        }
+
+        // Simulate random transactions (credits/debits)
+        function simulateRandomTransaction() {
+            const types = ['credit', 'debit'];
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            const currentBalance = parseFloat(accountBalance.textContent.replace(/,/g, ''));
+            
+            let amount, name, description, bank, account;
+            
+            if (randomType === 'credit') {
+                amount = Math.floor(Math.random() * 50000) + 1000;
+                const senders = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams', 'David Brown'];
+                name = senders[Math.floor(Math.random() * senders.length)];
+                description = 'Transfer from ' + name;
+                bank = ['MoniePoint MFB', 'GTBank', 'Zenith Bank', 'Access Bank', 'UBA'][Math.floor(Math.random() * 5)];
+                account = Math.floor(Math.random() * 9000000000) + 1000000000;
+            } else {
+                amount = Math.floor(Math.random() * 20000) + 500;
+                const bills = ['MTN Airtime', 'Airtel Data', 'IKEDC Electricity', 'DSTV Subscription', 'GOTV Payment'];
+                name = bills[Math.floor(Math.random() * bills.length)];
+                description = name.includes('Airtime') ? 'Airtime purchase' : 
+                             name.includes('Data') ? 'Data purchase' : 
+                             name.includes('Electricity') ? 'Electricity bill' : 'TV subscription';
+                bank = name.split(' ')[0];
+                account = name.includes('Electricity') ? 'EKED' + (Math.floor(Math.random() * 900000) + 100000) : 
+                          name.includes('Airtime') || name.includes('Data') ? '080' + (Math.floor(Math.random() * 90000000) + 10000000) : 
+                          'SUB' + (Math.floor(Math.random() * 900000) + 100000);
+            }
+            
+            // Create new transaction
+            const newTransaction = {
+                id: transactions.length + 1,
+                type: randomType,
+                amount: amount,
+                name: name,
+                date: new Date().toISOString(),
+                description: description,
+                bank: bank,
+                account: account.toString()
+            };
+            
+            // Add to transactions array
+            transactions.unshift(newTransaction);
+            
+            // Update balance
+            const newBalance = randomType === 'credit' ? currentBalance + amount : currentBalance - amount;
+            accountBalance.textContent = newBalance.toLocaleString();
+            
+            // Update transactions list
+            displayTransactions();
+            
+            // Send email notification
+            sendEmailNotification(newTransaction, randomType);
+        }
+
+        // Simulate sending email notification (in a real app, this would use Nodemailer)
+        function sendEmailNotification(transaction, type) {
+            console.log(`Email sent to user@example.com:
+                Subject: ${type === 'credit' ? 'Credit Alert' : 'Debit Alert'} - MoniePoint
+                Body: 
+                Dear Customer,
+                
+                Your account has been ${type === 'credit' ? 'credited' : 'debited'} with ₦${transaction.amount.toLocaleString()}.
+                
+                ${type === 'credit' ? 'Sender' : 'Recipient'}: ${transaction.name}
+                ${transaction.bank === 'MTN' || transaction.bank === 'Airtel' || transaction.bank === 'Glo' || transaction.bank === '9mobile' ? 'Phone Number' : 'Account Number'}: ${transaction.account}
+                Bank/Provider: ${transaction.bank}
+                Description: ${transaction.description}
+                Date: ${new Date(transaction.date).toLocaleString()}
+                Available Balance: ₦${accountBalance.textContent}
+                
+                Thank you for banking with us.
+                
+                MoniePoint MFB
+            `);
+            
+            // In a real Node.js backend, this would use Nodemailer like:
+            /*
+            const nodemailer = require('nodemailer');
+            
+            let transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'your-email@gmail.com',
+                    pass: 'your-password'
+                }
+            });
+            
+            let mailOptions = {
+                from: 'your-email@gmail.com',
+                to: 'user@example.com',
+                subject: `${type === 'credit' ? 'Credit Alert' : 'Debit Alert'} - MoniePoint`,
+                text: `Dear Customer,...` // Email body as above
+            };
+            
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+            */
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
