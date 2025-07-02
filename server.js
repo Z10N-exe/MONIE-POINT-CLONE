@@ -8,6 +8,20 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Path validation middleware (FIRST)
+app.use((req, res, next) => {
+  const path = req.path;
+  console.log(`Incoming request - Method: ${req.method}, Path: ${path}, URL: ${req.originalUrl}`);
+  if (path.includes('://')) {
+    console.warn(`Rejected invalid path: ${path}`);
+    return res.status(400).json({
+      status: 'error',
+      message: `Invalid URL in request path: ${path}`
+    });
+  }
+  next();
+});
+
 // Enhanced Middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -16,23 +30,6 @@ app.use(cors({
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Log incoming requests for debugging
-app.use((req, res, next) => {
-  console.log(`Request URL: ${req.originalUrl}, Path: ${req.path}`);
-  next();
-});
-
-// Validate request paths to prevent invalid URLs
-app.use((req, res, next) => {
-  if (req.path.includes('://')) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Invalid URL in request path'
-    });
-  }
-  next();
-});
 
 // Secure Email Configuration
 const transporter = nodemailer.createTransport({
@@ -90,8 +87,6 @@ const generateEmailTemplate = (user, transaction, type) => {
 };
 
 // Enhanced API Routes
-
-// Get user data with error handling
 app.get('/api/user', (req, res, next) => {
   try {
     const user = users[0];
@@ -111,7 +106,6 @@ app.get('/api/user', (req, res, next) => {
   }
 });
 
-// Create user with validation
 app.post('/api/users', async (req, res, next) => {
   try {
     const { username, email, initialBalance } = req.body;
@@ -144,13 +138,11 @@ app.post('/api/users', async (req, res, next) => {
   }
 });
 
-// Process transaction with better validation
 app.post('/api/transactions', async (req, res, next) => {
   try {
     const { type, amount, name, description, bank, account } = req.body;
     const user = users[0];
 
-    // Validate input
     if (!['credit', 'debit'].includes(type)) {
       return res.status(400).json({
         status: 'error',
@@ -166,7 +158,7 @@ app.post('/api/transactions', async (req, res, next) => {
       });
     }
 
-    if (type === 'debit' && amountNum > user.balance) {
+    if (type === 'debit' && amountNum > user.balance SCAN) {
       return res.status(400).json({
         status: 'error',
         message: 'Insufficient balance'
@@ -185,15 +177,12 @@ app.post('/api/transactions', async (req, res, next) => {
       status: 'completed'
     };
 
-    // Update balance
     user.balance = type === 'credit'
       ? user.balance + transaction.amount
       : user.balance - transaction.amount;
 
-    // Add transaction
     user.transactions.unshift(transaction);
 
-    // Send email (async - don't wait for response)
     sendEmailNotification(user, transaction, type)
       .catch(e => console.error('Email sending failed:', e));
 
@@ -209,12 +198,14 @@ app.post('/api/transactions', async (req, res, next) => {
   }
 });
 
-// Serve frontend - must be last route
-app.get('/*', (req, res) => {
-  if (req.path.match(/^https?:\/\//)) {
+// Updated catch-all route
+app.get('*', (req, res) => {
+  const path = req.path;
+  if (path.includes('://')) {
+    console.warn(`Catch-all route received invalid path: ${path}`);
     return res.status(400).json({
       status: 'error',
-      message: 'Invalid route path'
+      message: `Invalid route path: ${path}`
     });
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
