@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoniePoint Nigeria</title>
+    <title>FlexiPay Nigeria</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
@@ -38,8 +39,8 @@
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <img src="https://moniepoint.com/wp-content/uploads/2022/03/moniepoint-logo.svg" alt="MoniePoint Logo" class="h-10">
-                    <span class="ml-2 text-xl font-bold">MoniePoint</span>
+                    <img src="https://via.placeholder.com/40x40.png?text=FP" alt="FlexiPay Logo" class="h-10">
+                    <span class="ml-2 text-xl font-bold">FlexiPay</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="relative">
@@ -72,11 +73,12 @@
                             <div class="h-8 w-8 rounded-full bg-blue-300 flex items-center justify-center">
                                 <i class="fas fa-user text-blue-800"></i>
                             </div>
-                            <span class="font-medium">User</span>
+                            <span id="profile-username" class="font-medium">User</span>
                             <i class="fas fa-chevron-down text-xs"></i>
                         </button>
                         <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                             <div class="py-1">
+                                <a href="#" id="create-user-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Create User</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
@@ -102,7 +104,7 @@
                     <h1 class="text-3xl font-bold mb-2">₦<span id="account-balance">48,750.00</span></h1>
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>Account: 0123456789</span>
-                        <span>MoniePoint MFB</span>
+                        <span>FlexiPay MFB</span>
                     </div>
                 </div>
 
@@ -198,6 +200,50 @@
                     </div>
                 </div>
 
+                <!-- Loading Modal -->
+                <div id="loading-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 flex items-center justify-center">
+                        <i class="fas fa-spinner fa-spin text-blue-600 text-2xl mr-3"></i>
+                        <span class="text-lg font-semibold">Processing Transaction...</span>
+                    </div>
+                </div>
+
+                <!-- Create User Modal -->
+                <div id="create-user-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg w-full max-w-md">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Create New User</h3>
+                                <button id="close-create-user-modal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <form id="create-user-form">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="new-username">
+                                        Username
+                                    </label>
+                                    <input type="text" id="new-username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter username">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="initial-balance">
+                                        Initial Balance (₦)
+                                    </label>
+                                    <input type="number" id="initial-balance" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter initial balance" min="0">
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancel-create-user" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        Create User
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Transfer Modal -->
                 <div id="transfer-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div class="bg-white rounded-lg w-full max-w-md">
@@ -215,7 +261,7 @@
                                     </label>
                                     <select id="recipient-bank" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="">Select Bank</option>
-                                        <option value="moniepoint">MoniePoint MFB</option>
+                                        <option value="flexipay">FlexiPay MFB</option>
                                         <option value="gtbank">GTBank</option>
                                         <option value="zenith">Zenith Bank</option>
                                         <option value="access">Access Bank</option>
@@ -230,9 +276,9 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-medium mb-2" for="account-name">
-                                        Account Name
+                                        Recipient Name
                                     </label>
-                                    <input type="text" id="account-name" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly>
+                                    <input type="text" id="account-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter recipient's name">
                                 </div>
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-medium mb-2" for="amount">
@@ -252,6 +298,48 @@
                                     </button>
                                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         Transfer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deposit Modal -->
+                <div id="deposit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg w-full max-w-md">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Deposit Money</h3>
+                                <button id="close-deposit-modal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <form id="deposit-form">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="deposit-sender-name">
+                                        Sender Name
+                                    </label>
+                                    <input type="text" id="deposit-sender-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter sender's name">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="deposit-amount">
+                                        Amount (₦)
+                                    </label>
+                                    <input type="number" id="deposit-amount" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter amount">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="deposit-narration">
+                                        Narration (Optional)
+                                    </label>
+                                    <input type="text" id="deposit-narration" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter description">
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancel-deposit" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        Deposit
                                     </button>
                                 </div>
                             </form>
@@ -289,7 +377,6 @@
                                     </label>
                                     <select id="provider" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="">Select Provider</option>
-                                        <!-- Providers will be populated based on bill type -->
                                     </select>
                                 </div>
                                 <div class="mb-4">
@@ -332,7 +419,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <button id="print-receipt" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                                    <i class="fas fa-print mr-2"></i> Print
+                                    <i class="fas fa-print mr-2"></i> Download PDF
                                 </button>
                                 <button id="share-receipt" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                                     <i class="fas fa-share-alt mr-2"></i> Share
@@ -350,7 +437,7 @@
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
-                    <h3 class="text-lg font-semibold mb-4">MoniePoint</h3>
+                    <h3 class="text-lg font-semibold mb-4">FlexiPay</h3>
                     <p class="text-gray-400">Making financial services accessible and affordable for everyone.</p>
                 </div>
                 <div>
@@ -374,13 +461,13 @@
                     <h3 class="text-lg font-semibold mb-4">Contact</h3>
                     <ul class="space-y-2">
                         <li class="flex items-center text-gray-400"><i class="fas fa-phone-alt mr-2"></i> +234 700 933 9333</li>
-                        <li class="flex items-center text-gray-400"><i class="fas fa-envelope mr-2"></i> help@moniepoint.com</li>
+                        <li class="flex items-center text-gray-400"><i class="fas fa-envelope mr-2"></i> help@flexipay.com</li>
                         <li class="flex items-center text-gray-400"><i class="fas fa-map-marker-alt mr-2"></i> Lagos, Nigeria</li>
                     </ul>
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 mb-4 md:mb-0">© 2023 MoniePoint MFB. All rights reserved.</p>
+                <p class="text-gray-400 mb-4 md:mb-0">© 2023 FlexiPay MFB. All rights reserved.</p>
                 <div class="flex space-x-4">
                     <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
@@ -396,7 +483,15 @@
         const notificationsBtn = document.getElementById('notifications-btn');
         const notificationsDropdown = document.getElementById('notifications-dropdown');
         const profileBtn = document.getElementById('profile-btn');
+        const profileUsername = document.getElementById('profile-username');
         const profileDropdown = document.getElementById('profile-dropdown');
+        const createUserBtn = document.getElementById('create-user-btn');
+        const createUserModal = document.getElementById('create-user-modal');
+        const closeCreateUserModal = document.getElementById('close-create-user-modal');
+        const cancelCreateUser = document.getElementById('cancel-create-user');
+        const createUserForm = document.getElementById('create-user-form');
+        const newUsername = document.getElementById('new-username');
+        const initialBalance = document.getElementById('initial-balance');
         const quickActionBtns = document.querySelectorAll('.quick-action-btn');
         const transferModal = document.getElementById('transfer-modal');
         const closeTransferModal = document.getElementById('close-transfer-modal');
@@ -406,6 +501,11 @@
         const closeBillModal = document.getElementById('close-bill-modal');
         const cancelBill = document.getElementById('cancel-bill');
         const billForm = document.getElementById('bill-form');
+        const depositModal = document.getElementById('deposit-modal');
+        const closeDepositModal = document.getElementById('close-deposit-modal');
+        const cancelDeposit = document.getElementById('cancel-deposit');
+        const depositForm = document.getElementById('deposit-form');
+        const loadingModal = document.getElementById('loading-modal');
         const receiptModal = document.getElementById('receipt-modal');
         const closeReceiptModal = document.getElementById('close-receipt-modal');
         const printReceipt = document.getElementById('print-receipt');
@@ -420,11 +520,14 @@
         const provider = document.getElementById('provider');
         const billAccount = document.getElementById('bill-account');
         const billAmount = document.getElementById('bill-amount');
+        const depositSenderName = document.getElementById('deposit-sender-name');
+        const depositAmount = document.getElementById('deposit-amount');
+        const depositNarration = document.getElementById('deposit-narration');
 
         // Sample transactions data
-        const transactions = [
+        let transactions = [
             {
-                id: 1,
+                id: 'FPX-AB2XY9-162509',
                 type: 'credit',
                 amount: 15000,
                 name: 'John Doe',
@@ -434,7 +537,7 @@
                 account: '0123456789'
             },
             {
-                id: 2,
+                id: 'FPX-CD4ZW1-162508',
                 type: 'debit',
                 amount: 5000,
                 name: 'MTN Airtime',
@@ -444,7 +547,7 @@
                 account: '08012345678'
             },
             {
-                id: 3,
+                id: 'FPX-EF6PQ3-162507',
                 type: 'credit',
                 amount: 30000,
                 name: 'Salary Payment',
@@ -454,7 +557,7 @@
                 account: 'Payroll'
             },
             {
-                id: 4,
+                id: 'FPX-GH8RS5-162506',
                 type: 'debit',
                 amount: 12000,
                 name: 'Jane Smith',
@@ -473,6 +576,17 @@
             'cable-tv': ['DSTV', 'GOTV', 'Startimes', 'Showmax'],
             internet: ['Spectranet', 'Smile', 'Tizeti', 'FibreOne']
         };
+
+        // Generate realistic transaction ID
+        function generateTransactionId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let randomString = '';
+            for (let i = 0; i < 6; i++) {
+                randomString += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            const timestamp = Math.floor(Date.now() / 1000).toString().slice(-6);
+            return `FPX-${randomString}-${timestamp}`;
+        }
 
         // Initialize the app
         function init() {
@@ -534,13 +648,24 @@
                 notificationsDropdown.classList.add('hidden');
             });
 
-            // Close dropdowns when clicking outside
+            // Create user modal
+            createUserBtn.addEventListener('click', () => {
+                createUserModal.classList.remove('hidden');
+                profileDropdown.classList.add('hidden');
+            });
+            closeCreateUserModal.addEventListener('click', () => createUserModal.classList.add('hidden'));
+            cancelCreateUser.addEventListener('click', () => createUserModal.classList.add('hidden'));
+
+            // Close dropdowns and modals when clicking outside
             document.addEventListener('click', (e) => {
                 if (!notificationsBtn.contains(e.target) && !notificationsDropdown.contains(e.target)) {
                     notificationsDropdown.classList.add('hidden');
                 }
                 if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
                     profileDropdown.classList.add('hidden');
+                }
+                if (!createUserBtn.contains(e.target) && !createUserModal.contains(e.target)) {
+                    createUserModal.classList.add('hidden');
                 }
             });
 
@@ -551,6 +676,8 @@
                     
                     if (action === 'transfer') {
                         transferModal.classList.remove('hidden');
+                    } else if (action === 'deposit') {
+                        depositModal.classList.remove('hidden');
                     } else if (action === 'bills') {
                         billModal.classList.remove('hidden');
                     } else {
@@ -562,34 +689,47 @@
             // Transfer modal
             closeTransferModal.addEventListener('click', () => transferModal.classList.add('hidden'));
             cancelTransfer.addEventListener('click', () => transferModal.classList.add('hidden'));
-            
+
+            // Deposit modal
+            closeDepositModal.addEventListener('click', () => depositModal.classList.add('hidden'));
+            cancelDeposit.addEventListener('click', () => depositModal.classList.add('hidden'));
+
             // Bill modal
             closeBillModal.addEventListener('click', () => billModal.classList.add('hidden'));
             cancelBill.addEventListener('click', () => billModal.classList.add('hidden'));
-            
+
             // Receipt modal
             closeReceiptModal.addEventListener('click', () => receiptModal.classList.add('hidden'));
-            printReceipt.addEventListener('click', () => {
-                alert('Printing receipt...');
-                // In a real app, this would open the print dialog
-            });
-            shareReceipt.addEventListener('click', () => {
-                alert('Sharing receipt...');
-                // In a real app, this would open the share dialog
-            });
 
-            // Account number validation
-            accountNumber.addEventListener('input', () => {
-                if (accountNumber.value.length === 10) {
-                    // Simulate account name lookup
-                    accountName.value = 'Verified Account';
-                    accountName.classList.remove('bg-gray-100');
-                    accountName.classList.add('bg-green-100');
-                } else {
-                    accountName.value = '';
-                    accountName.classList.remove('bg-green-100');
-                    accountName.classList.add('bg-gray-100');
+            // Create user form submission
+            createUserForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const username = newUsername.value.trim();
+                const initBalance = parseFloat(initialBalance.value);
+                
+                if (!username) {
+                    alert('Please enter a username.');
+                    return;
                 }
+                if (isNaN(initBalance) || initBalance < 0) {
+                    alert('Please enter a valid initial balance (0 or positive).');
+                    return;
+                }
+                
+                // Update user details
+                profileUsername.textContent = username;
+                accountBalance.textContent = initBalance.toLocaleString();
+                
+                // Reset transactions for new user
+                transactions = [];
+                displayTransactions();
+                
+                // Close modal and reset form
+                createUserModal.classList.add('hidden');
+                createUserForm.reset();
+                
+                alert(`User ${username} created with initial balance ₦${initBalance.toLocaleString()}`);
             });
 
             // Bill type change
@@ -612,46 +752,115 @@
                 e.preventDefault();
                 
                 const transferAmount = parseFloat(amount.value);
+                const recipientName = accountName.value.trim();
                 const currentBalance = parseFloat(accountBalance.textContent.replace(/,/g, ''));
                 
+                if (!recipientName) {
+                    alert('Please enter a recipient name.');
+                    return;
+                }
                 if (transferAmount > currentBalance) {
                     alert('Insufficient balance!');
                     return;
                 }
+                if (transferAmount <= 0 || isNaN(transferAmount)) {
+                    alert('Please enter a valid transfer amount.');
+                    return;
+                }
                 
-                // Create new transaction
-                const newTransaction = {
-                    id: transactions.length + 1,
-                    type: 'debit',
-                    amount: transferAmount,
-                    name: accountName.value || 'Transfer',
-                    date: new Date().toISOString(),
-                    description: document.getElementById('narration').value || 'Transfer',
-                    bank: recipientBank.options[recipientBank.selectedIndex].text,
-                    account: accountNumber.value
-                };
+                // Show loading modal
+                loadingModal.classList.remove('hidden');
                 
-                // Add to transactions array
-                transactions.unshift(newTransaction);
+                // Process transaction after delay
+                setTimeout(() => {
+                    // Create new transaction
+                    const newTransaction = {
+                        id: generateTransactionId(),
+                        type: 'debit',
+                        amount: transferAmount,
+                        name: recipientName,
+                        date: new Date().toISOString(),
+                        description: document.getElementById('narration').value || 'Transfer',
+                        bank: recipientBank.options[recipientBank.selectedIndex].text,
+                        account: accountNumber.value
+                    };
+                    
+                    // Add to transactions array
+                    transactions.unshift(newTransaction);
+                    
+                    // Update balance
+                    accountBalance.textContent = (currentBalance - transferAmount).toLocaleString();
+                    
+                    // Close modal and reset form
+                    transferModal.classList.add('hidden');
+                    transferForm.reset();
+                    
+                    // Update transactions list
+                    displayTransactions();
+                    
+                    // Hide loading modal and show receipt
+                    loadingModal.classList.add('hidden');
+                    showReceipt(newTransaction);
+                    
+                    // Send email notification
+                    sendEmailNotification(newTransaction, 'debit');
+                }, 2000); // 2-second delay
+            });
+
+            // Deposit form submission
+            depositForm.addEventListener('submit', (e) => {
+                e.preventDefault();
                 
-                // Update balance
-                accountBalance.textContent = (currentBalance - transferAmount).toLocaleString();
+                const depositAmt = parseFloat(depositAmount.value);
+                const sender = depositSenderName.value.trim();
+                const currentBalance = parseFloat(accountBalance.textContent.replace(/,/g, ''));
                 
-                // Close modal and reset form
-                transferModal.classList.add('hidden');
-                transferForm.reset();
-                accountName.value = '';
-                accountName.classList.remove('bg-green-100');
-                accountName.classList.add('bg-gray-100');
+                if (!sender) {
+                    alert('Please enter a sender name.');
+                    return;
+                }
+                if (depositAmt <= 0 || isNaN(depositAmt)) {
+                    alert('Please enter a valid deposit amount.');
+                    return;
+                }
                 
-                // Update transactions list
-                displayTransactions();
+                // Show loading modal
+                loadingModal.classList.remove('hidden');
                 
-                // Show receipt
-                showReceipt(newTransaction);
-                
-                // Send email notification
-                sendEmailNotification(newTransaction, 'debit');
+                // Process transaction after delay
+                setTimeout(() => {
+                    // Create new transaction
+                    const newTransaction = {
+                        id: generateTransactionId(),
+                        type: 'credit',
+                        amount: depositAmt,
+                        name: sender,
+                        date: new Date().toISOString(),
+                        description: depositNarration.value || 'Deposit',
+                        bank: 'FlexiPay MFB',
+                        account: '0123456789'
+                    };
+                    
+                    // Add to transactions array
+                    transactions.unshift(newTransaction);
+                    
+                    // Update balance
+                    accountBalance.textContent = (currentBalance + depositAmt).toLocaleString();
+                    
+                    // Close modal and reset form
+                    depositModal.classList.add('hidden');
+                    depositForm.reset();
+                    
+                    // Update transactions list
+                    displayTransactions();
+                    
+                    // Hide loading modal and show receipt
+                    loadingModal.classList.add('hidden');
+                    showReceipt(newTransaction);
+                    
+                    // Send email notification
+                    sendEmailNotification(newTransaction, 'credit');
+                }, 2000); // 2-second delay
             });
 
             // Bill form submission
@@ -665,38 +874,49 @@
                     alert('Insufficient balance!');
                     return;
                 }
+                if (billPaymentAmount <= 0 || isNaN(billPaymentAmount)) {
+                    alert('Please enter a valid amount.');
+                    return;
+                }
                 
-                // Create new transaction
-                const newTransaction = {
-                    id: transactions.length + 1,
-                    type: 'debit',
-                    amount: billPaymentAmount,
-                    name: provider.options[provider.selectedIndex].text,
-                    date: new Date().toISOString(),
-                    description: `${billType.options[billType.selectedIndex].text} payment`,
-                    bank: provider.options[provider.selectedIndex].text,
-                    account: billAccount.value
-                };
+                // Show loading modal
+                loadingModal.classList.remove('hidden');
                 
-                // Add to transactions array
-                transactions.unshift(newTransaction);
-                
-                // Update balance
-                accountBalance.textContent = (currentBalance - billPaymentAmount).toLocaleString();
-                
-                // Close modal and reset form
-                billModal.classList.add('hidden');
-                billForm.reset();
-                provider.innerHTML = '<option value="">Select Provider</option>';
-                
-                // Update transactions list
-                displayTransactions();
-                
-                // Show receipt
-                showReceipt(newTransaction);
-                
-                // Send email notification
-                sendEmailNotification(newTransaction, 'debit');
+                // Process transaction after delay
+                setTimeout(() => {
+                    // Create new transaction
+                    const newTransaction = {
+                        id: generateTransactionId(),
+                        type: 'debit',
+                        amount: billPaymentAmount,
+                        name: provider.options[provider.selectedIndex].text,
+                        date: new Date().toISOString(),
+                        description: `${billType.options[billType.selectedIndex].text} payment`,
+                        bank: provider.options[provider.selectedIndex].text,
+                        account: billAccount.value
+                    };
+                    
+                    // Add to transactions array
+                    transactions.unshift(newTransaction);
+                    
+                    // Update balance
+                    accountBalance.textContent = (currentBalance - billPaymentAmount).toLocaleString();
+                    
+                    // Close modal and reset form
+                    billModal.classList.add('hidden');
+                    billForm.reset();
+                    provider.innerHTML = '<option value="">Select Provider</option>';
+                    
+                    // Update transactions list
+                    displayTransactions();
+                    
+                    // Hide loading modal and show receipt
+                    loadingModal.classList.add('hidden');
+                    showReceipt(newTransaction);
+                    
+                    // Send email notification
+                    sendEmailNotification(newTransaction, 'debit');
+                }, 2000); // 2-second delay
             });
         }
 
@@ -719,7 +939,7 @@
                 <div class="bg-gray-50 rounded-lg p-4 mb-4">
                     <div class="flex justify-between py-2 border-b border-gray-200">
                         <span class="text-gray-600">Transaction ID:</span>
-                        <span class="font-medium">MP${transaction.id.toString().padStart(8, '0')}</span>
+                        <span class="font-medium">${transaction.id}</span>
                     </div>
                     <div class="flex justify-between py-2 border-b border-gray-200">
                         <span class="text-gray-600">Amount:</span>
@@ -755,10 +975,86 @@
                 </div>
             `;
             
+            // PDF export for receipt
+            printReceipt.onclick = () => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFontSize(18);
+                doc.text('FlexiPay Transaction Receipt', 20, 20);
+                
+                doc.setFontSize(14);
+                doc.text(`${typeText} of ₦${transaction.amount.toLocaleString()}`, 20, 40);
+                doc.setFontSize(12);
+                doc.text(`Date: ${new Date(transaction.date).toLocaleString()}`, 20, 50);
+                
+                doc.text('Transaction Details', 20, 70);
+                doc.text(`Transaction ID: ${transaction.id}`, 20, 80);
+                doc.text(`Amount: ${sign}₦${transaction.amount.toLocaleString()}`, 20, 90);
+                doc.text(`Type: ${typeText}`, 20, 100);
+                doc.text(`Description: ${transaction.description}`, 20, 110);
+                doc.text(`Status: Completed`, 20, 120);
+                
+                doc.text(`${transaction.type === 'credit' ? 'Sender' : 'Recipient'} Details`, 20, 140);
+                doc.text(`Name: ${transaction.name}`, 20, 150);
+                doc.text(`${transaction.bank === 'MTN' || transaction.bank === 'Airtel' || transaction.bank === 'Glo' || transaction.bank === '9mobile' ? 'Phone Number' : 'Account Number'}: ${transaction.account}`, 20, 160);
+                doc.text(`Bank/Provider: ${transaction.bank}`, 20, 170);
+                
+                doc.text(`Available Balance: ₦${accountBalance.textContent}`, 20, 190);
+                
+                doc.save(`FlexiPay_Receipt_${transaction.id}.pdf`);
+            };
+            
+            // Share receipt
+            shareReceipt.onclick = () => {
+                const shareText = `
+FlexiPay Transaction Receipt
+${typeText} of ₦${transaction.amount.toLocaleString()}
+Date: ${new Date(transaction.date).toLocaleString()}
+
+Transaction Details:
+Transaction ID: ${transaction.id}
+Amount: ${sign}₦${transaction.amount.toLocaleString()}
+Type: ${typeText}
+Description: ${transaction.description}
+Status: Completed
+
+${transaction.type === 'credit' ? 'Sender' : 'Recipient'} Details:
+Name: ${transaction.name}
+${transaction.bank === 'MTN' || transaction.bank === 'Airtel' || transaction.bank === 'Glo' || transaction.bank === '9mobile' ? 'Phone Number' : 'Account Number'}: ${transaction.account}
+Bank/Provider: ${transaction.bank}
+
+Available Balance: ₦${accountBalance.textContent}
+                `.trim();
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'FlexiPay Transaction Receipt',
+                        text: shareText
+                    }).then(() => {
+                        alert('Receipt shared successfully!');
+                    }).catch((error) => {
+                        console.error('Error sharing receipt:', error);
+                        alert('Failed to share receipt. Copying to clipboard instead.');
+                        navigator.clipboard.writeText(shareText).then(() => {
+                            alert('Receipt copied to clipboard!');
+                        }).catch(() => {
+                            alert('Failed to copy receipt to clipboard.');
+                        });
+                    });
+                } else {
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        alert('Receipt copied to clipboard!');
+                    }).catch(() => {
+                        alert('Failed to copy receipt to clipboard.');
+                    });
+                }
+            };
+            
             receiptModal.classList.remove('hidden');
         }
 
-        // Simulate random transactions (credits/debits)
+        // Simulate random transactions
         function simulateRandomTransaction() {
             const types = ['credit', 'debit'];
             const randomType = types[Math.floor(Math.random() * types.length)];
@@ -771,7 +1067,7 @@
                 const senders = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams', 'David Brown'];
                 name = senders[Math.floor(Math.random() * senders.length)];
                 description = 'Transfer from ' + name;
-                bank = ['MoniePoint MFB', 'GTBank', 'Zenith Bank', 'Access Bank', 'UBA'][Math.floor(Math.random() * 5)];
+                bank = ['FlexiPay MFB', 'GTBank', 'Zenith Bank', 'Access Bank', 'UBA'][Math.floor(Math.random() * 5)];
                 account = Math.floor(Math.random() * 9000000000) + 1000000000;
             } else {
                 amount = Math.floor(Math.random() * 20000) + 500;
@@ -788,7 +1084,7 @@
             
             // Create new transaction
             const newTransaction = {
-                id: transactions.length + 1,
+                id: generateTransactionId(),
                 type: randomType,
                 amount: amount,
                 name: name,
@@ -812,10 +1108,10 @@
             sendEmailNotification(newTransaction, randomType);
         }
 
-        // Simulate sending email notification (in a real app, this would use Nodemailer)
+        // Simulate sending email notification
         function sendEmailNotification(transaction, type) {
             console.log(`Email sent to user@example.com:
-                Subject: ${type === 'credit' ? 'Credit Alert' : 'Debit Alert'} - MoniePoint
+                Subject: ${type === 'credit' ? 'Credit Alert' : 'Debit Alert'} - FlexiPay
                 Body: 
                 Dear Customer,
                 
@@ -826,40 +1122,13 @@
                 Bank/Provider: ${transaction.bank}
                 Description: ${transaction.description}
                 Date: ${new Date(transaction.date).toLocaleString()}
+                Transaction ID: ${transaction.id}
                 Available Balance: ₦${accountBalance.textContent}
                 
                 Thank you for banking with us.
                 
-                MoniePoint MFB
+                FlexiPay MFB
             `);
-            
-            // In a real Node.js backend, this would use Nodemailer like:
-            /*
-            const nodemailer = require('nodemailer');
-            
-            let transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: 'your-email@gmail.com',
-                    pass: 'your-password'
-                }
-            });
-            
-            let mailOptions = {
-                from: 'your-email@gmail.com',
-                to: 'user@example.com',
-                subject: `${type === 'credit' ? 'Credit Alert' : 'Debit Alert'} - MoniePoint`,
-                text: `Dear Customer,...` // Email body as above
-            };
-            
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log('Email sent: ' + info.response);
-                }
-            });
-            */
         }
 
         // Initialize the app when DOM is loaded
